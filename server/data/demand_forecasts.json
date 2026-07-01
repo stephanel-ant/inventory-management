@@ -1,83 +1,290 @@
 [
   {
     "id": "1",
-    "item_sku": "WDG-001",
-    "item_name": "Industrial Widget Type A",
-    "current_demand": 300,
-    "forecasted_demand": 450,
-    "trend": "increasing",
-    "period": "Next 30 days"
-  },
-  {
-    "id": "2",
-    "item_sku": "BRG-102",
-    "item_name": "Steel Bearing Assembly",
-    "current_demand": 150,
-    "forecasted_demand": 152,
+    "item_sku": "PCB-001",
+    "item_name": "Single Layer PCB Assembly",
+    "current_demand": 327,
+    "forecasted_demand": 330,
     "trend": "stable",
     "period": "Next 30 days"
   },
   {
-    "id": "3",
-    "item_sku": "GSK-203",
-    "item_name": "High-Temperature Gasket",
-    "current_demand": 500,
-    "forecasted_demand": 600,
+    "id": "2",
+    "item_sku": "PCB-002",
+    "item_name": "Dual Layer PCB Assembly",
+    "current_demand": 259,
+    "forecasted_demand": 355,
     "trend": "increasing",
     "period": "Next 30 days"
   },
   {
+    "id": "3",
+    "item_sku": "PCB-003",
+    "item_name": "Multi Layer PCB Assembly",
+    "current_demand": 331,
+    "forecasted_demand": 325,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
     "id": "4",
-    "item_sku": "MTR-304",
-    "item_name": "Electric Motor 5HP",
-    "current_demand": 50,
-    "forecasted_demand": 35,
-    "trend": "decreasing",
+    "item_sku": "TMP-201",
+    "item_name": "Temperature Sensor Module",
+    "current_demand": 90,
+    "forecasted_demand": 106,
+    "trend": "increasing",
     "period": "Next 30 days"
   },
   {
     "id": "5",
-    "item_sku": "FLT-405",
-    "item_name": "Oil Filter Cartridge",
-    "current_demand": 800,
-    "forecasted_demand": 950,
+    "item_sku": "HMD-202",
+    "item_name": "Humidity Sensor Module",
+    "current_demand": 104,
+    "forecasted_demand": 120,
     "trend": "increasing",
     "period": "Next 30 days"
   },
   {
     "id": "6",
-    "item_sku": "VLV-506",
-    "item_name": "Pressure Relief Valve",
-    "current_demand": 120,
-    "forecasted_demand": 121,
-    "trend": "stable",
+    "item_sku": "PRS-203",
+    "item_name": "Pressure Sensor Module",
+    "current_demand": 927,
+    "forecasted_demand": 1261,
+    "trend": "increasing",
     "period": "Next 30 days"
   },
   {
     "id": "7",
-    "item_sku": "PSU-501",
-    "item_name": "5V 10A Switching Power Supply",
-    "current_demand": 250,
-    "forecasted_demand": 252,
-    "trend": "stable",
+    "item_sku": "PRX-204",
+    "item_name": "Proximity Sensor",
+    "current_demand": 1299,
+    "forecasted_demand": 1723,
+    "trend": "increasing",
     "period": "Next 30 days"
   },
   {
     "id": "8",
-    "item_sku": "SNR-420",
-    "item_name": "Temperature Sensor Module",
-    "current_demand": 180,
-    "forecasted_demand": 182,
-    "trend": "stable",
+    "item_sku": "ULS-205",
+    "item_name": "Ultrasonic Distance Sensor",
+    "current_demand": 478,
+    "forecasted_demand": 407,
+    "trend": "decreasing",
     "period": "Next 30 days"
   },
   {
     "id": "9",
-    "item_sku": "CTL-330",
-    "item_name": "Logic Controller Board",
-    "current_demand": 95,
-    "forecasted_demand": 96,
+    "item_sku": "SRV-301",
+    "item_name": "Micro Servo Motor",
+    "current_demand": 44,
+    "forecasted_demand": 55,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "10",
+    "item_sku": "SRV-302",
+    "item_name": "Standard Servo Motor",
+    "current_demand": 29,
+    "forecasted_demand": 34,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "11",
+    "item_sku": "STP-303",
+    "item_name": "Stepper Motor NEMA 17",
+    "current_demand": 65,
+    "forecasted_demand": 91,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "12",
+    "item_sku": "MCU-401",
+    "item_name": "8-bit Microcontroller",
+    "current_demand": 884,
+    "forecasted_demand": 892,
     "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "13",
+    "item_sku": "MCU-402",
+    "item_name": "32-bit ARM Microcontroller",
+    "current_demand": 1073,
+    "forecasted_demand": 1054,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "14",
+    "item_sku": "DSP-403",
+    "item_name": "Digital Signal Processor",
+    "current_demand": 846,
+    "forecasted_demand": 1129,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "15",
+    "item_sku": "ACC-206",
+    "item_name": "3-Axis Accelerometer",
+    "current_demand": 198,
+    "forecasted_demand": 146,
+    "trend": "decreasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "16",
+    "item_sku": "GYR-207",
+    "item_name": "Gyroscope Module",
+    "current_demand": 226,
+    "forecasted_demand": 312,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "17",
+    "item_sku": "LDR-208",
+    "item_name": "Light Dependent Resistor",
+    "current_demand": 144,
+    "forecasted_demand": 125,
+    "trend": "decreasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "18",
+    "item_sku": "SPR-601",
+    "item_name": "Coil Spring Heavy Duty",
+    "current_demand": 410,
+    "forecasted_demand": 549,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "19",
+    "item_sku": "SPR-602",
+    "item_name": "Compression Spring",
+    "current_demand": 1002,
+    "forecasted_demand": 1259,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "20",
+    "item_sku": "PWM-404",
+    "item_name": "PWM Motor Controller",
+    "current_demand": 1768,
+    "forecasted_demand": 1798,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "21",
+    "item_sku": "DRV-405",
+    "item_name": "H-Bridge Motor Driver",
+    "current_demand": 1393,
+    "forecasted_demand": 1400,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "22",
+    "item_sku": "STP-304",
+    "item_name": "Stepper Motor NEMA 23",
+    "current_demand": 53,
+    "forecasted_demand": 52,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "23",
+    "item_sku": "PLY-901",
+    "item_name": "Drive Pulley",
+    "current_demand": 380,
+    "forecasted_demand": 515,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "24",
+    "item_sku": "LED-406",
+    "item_name": "LED Driver IC",
+    "current_demand": 572,
+    "forecasted_demand": 802,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "25",
+    "item_sku": "PSU-501",
+    "item_name": "5V 10A Switching Power Supply",
+    "current_demand": 352,
+    "forecasted_demand": 304,
+    "trend": "decreasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "26",
+    "item_sku": "PSU-502",
+    "item_name": "12V 5A Power Supply Module",
+    "current_demand": 346,
+    "forecasted_demand": 260,
+    "trend": "decreasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "27",
+    "item_sku": "PSU-503",
+    "item_name": "24V 3A Industrial Power Supply",
+    "current_demand": 341,
+    "forecasted_demand": 481,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "28",
+    "item_sku": "PSU-504",
+    "item_name": "Dual Output \u00b115V Power Supply",
+    "current_demand": 216,
+    "forecasted_demand": 280,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "29",
+    "item_sku": "PSU-505",
+    "item_name": "48V DC Power Supply Unit",
+    "current_demand": 183,
+    "forecasted_demand": 144,
+    "trend": "decreasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "30",
+    "item_sku": "PSU-506",
+    "item_name": "USB-C PD 100W Power Supply",
+    "current_demand": 490,
+    "forecasted_demand": 673,
+    "trend": "increasing",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "31",
+    "item_sku": "PSU-507",
+    "item_name": "Adjustable Bench Power Supply",
+    "current_demand": 113,
+    "forecasted_demand": 113,
+    "trend": "stable",
+    "period": "Next 30 days"
+  },
+  {
+    "id": "32",
+    "item_sku": "PSU-508",
+    "item_name": "Battery Backup Power Supply",
+    "current_demand": 77,
+    "forecasted_demand": 59,
+    "trend": "decreasing",
     "period": "Next 30 days"
   }
 ]
