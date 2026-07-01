@@ -27,6 +27,46 @@
         </div>
       </div>
 
+      <div v-if="purchaseOrders.length" class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ t('orders.submittedOrders') }} ({{ purchaseOrders.length }})</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ t('orders.table.poNumber') }}</th>
+                <th>{{ t('inventory.table.sku') }}</th>
+                <th>{{ t('inventory.table.itemName') }}</th>
+                <th>{{ t('inventory.table.warehouse') }}</th>
+                <th>{{ t('orders.quantity') }}</th>
+                <th>{{ t('inventory.table.unitCost') }}</th>
+                <th>{{ t('orders.table.totalValue') }}</th>
+                <th>{{ t('orders.table.orderDate') }}</th>
+                <th>{{ t('orders.table.leadTime') }}</th>
+                <th>{{ t('orders.table.expectedDelivery') }}</th>
+                <th>{{ t('orders.table.status') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="po in purchaseOrders" :key="po.id">
+                <td><strong>{{ po.order_number }}</strong></td>
+                <td>{{ po.item_sku }}</td>
+                <td>{{ po.item_name }}</td>
+                <td>{{ po.warehouse }}</td>
+                <td>{{ po.quantity }}</td>
+                <td>{{ currencySymbol }}{{ po.unit_cost.toFixed(2) }}</td>
+                <td><strong>{{ currencySymbol }}{{ po.total_cost.toLocaleString() }}</strong></td>
+                <td>{{ formatDate(po.created_date) }}</td>
+                <td>{{ po.lead_time_days }} {{ t('common.days') }}</td>
+                <td>{{ formatDate(po.expected_delivery_date) }}</td>
+                <td><span class="badge info">{{ t('status.submitted') }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ t('orders.allOrders') }} ({{ orders.length }})</h3>
@@ -95,6 +135,7 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+    const purchaseOrders = ref([])
 
     // Use shared filters
     const {
@@ -109,7 +150,10 @@ export default {
       try {
         loading.value = true
         const filters = getCurrentFilters()
-        const fetchedOrders = await api.getOrders(filters)
+        const [fetchedOrders, fetchedPurchaseOrders] = await Promise.all([
+          api.getOrders(filters),
+          api.getPurchaseOrders()
+        ])
 
         // Sort orders by order_date (earliest first)
         orders.value = fetchedOrders.sort((a, b) => {
@@ -117,6 +161,7 @@ export default {
           const dateB = new Date(b.order_date)
           return dateA - dateB
         })
+        purchaseOrders.value = fetchedPurchaseOrders
       } catch (err) {
         error.value = 'Failed to load orders: ' + err.message
       } finally {
@@ -160,6 +205,7 @@ export default {
       loading,
       error,
       orders,
+      purchaseOrders,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,

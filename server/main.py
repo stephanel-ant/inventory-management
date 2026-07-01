@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
@@ -12,6 +13,25 @@ QUARTER_MAP = {
     'Q2-2025': ['2025-04', '2025-05', '2025-06'],
     'Q3-2025': ['2025-07', '2025-08', '2025-09'],
     'Q4-2025': ['2025-10', '2025-11', '2025-12']
+}
+
+# Per-warehouse restocking lead times (days). Used to compute
+# expected_delivery_date on submitted purchase orders. Unknown
+# warehouses fall back to 7 days.
+WAREHOUSE_LEAD_TIME_DAYS = {
+    "San Francisco": 5,
+    "London": 10,
+    "Tokyo": 14,
+}
+
+# Heuristic weight applied to shortfall when ranking restocking
+# candidates — boosts items with rising demand so they win budget
+# allocation ahead of stable/declining ones. Not a business rule,
+# just a demo prioritization knob.
+TREND_MULTIPLIER = {
+    "increasing": 1.5,
+    "stable": 1.0,
+    "decreasing": 0.7,
 }
 
 def filter_by_month(items: list, month: Optional[str]) -> list:
@@ -103,22 +123,46 @@ class BacklogItem(BaseModel):
 
 class PurchaseOrder(BaseModel):
     id: str
-    backlog_item_id: str
-    supplier_name: str
+    order_number: str
+    item_sku: str
+    item_name: str
+    warehouse: str
     quantity: int
     unit_cost: float
-    expected_delivery_date: str
+    total_cost: float
     status: str
     created_date: str
-    notes: Optional[str] = None
+    lead_time_days: int
+    expected_delivery_date: str
+
+class PurchaseOrderLineItem(BaseModel):
+    sku: str
+    quantity: int
 
 class CreatePurchaseOrderRequest(BaseModel):
-    backlog_item_id: str
-    supplier_name: str
-    quantity: int
+    items: List[PurchaseOrderLineItem]
+
+class RestockingRecommendation(BaseModel):
+    item_sku: str
+    item_name: str
+    warehouse: str
+    category: str
     unit_cost: float
-    expected_delivery_date: str
-    notes: Optional[str] = None
+    quantity_on_hand: int
+    reorder_point: int
+    forecasted_demand: int
+    trend: str
+    shortfall: int
+    recommended_quantity: int
+    line_cost: float
+    priority_score: float
+    selected: bool
+
+class RestockingRecommendationsResponse(BaseModel):
+    budget: float
+    recommendations: List[RestockingRecommendation]
+    total_selected_cost: float
+    remaining_budget: float
 
 # API endpoints
 @app.get("/")
@@ -174,7 +218,9 @@ def get_backlog():
     for item in backlog_items:
         item_dict = dict(item)
         # Check if this backlog item has a purchase order
-        has_po = any(po["backlog_item_id"] == item["id"] for po in purchase_orders)
+        # Restocking POs don't carry backlog_item_id, so use .get() to
+        # avoid KeyError when the list contains SKU-based purchase orders.
+        has_po = any(po.get("backlog_item_id") == item["id"] for po in purchase_orders)
         item_dict["has_purchase_order"] = has_po
         result.append(item_dict)
     return result
@@ -303,6 +349,101 @@ def get_monthly_trends():
     result = list(months.values())
     result.sort(key=lambda x: x['month'])
     return result
+
+@app.get("/api/restocking/recommendations", response_model=RestockingRecommendationsResponse)
+def get_restocking_recommendations(
+    budget: float = 25000,
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None,
+):
+    """Rank forecast shortfalls and greedily select items within budget."""
+    inv_by_sku = {i["sku"]: i for i in inventory_items}
+    candidates = []
+    for f in demand_forecasts:
+        inv = inv_by_sku.get(f["item_sku"])
+        if not inv:
+            continue
+        if warehouse and warehouse != "all" and inv["warehouse"] != warehouse:
+            continue
+        if category and category != "all" and inv["category"].lower() != category.lower():
+            continue
+        shortfall = f["forecasted_demand"] - inv["quantity_on_hand"]
+        if shortfall <= 0:
+            continue
+        line_cost = round(shortfall * inv["unit_cost"], 2)
+        priority = round(shortfall * TREND_MULTIPLIER.get(f["trend"], 1.0), 2)
+        candidates.append({
+            "item_sku": f["item_sku"],
+            "item_name": f["item_name"],
+            "warehouse": inv["warehouse"],
+            "category": inv["category"],
+            "unit_cost": inv["unit_cost"],
+            "quantity_on_hand": inv["quantity_on_hand"],
+            "reorder_point": inv["reorder_point"],
+            "forecasted_demand": f["forecasted_demand"],
+            "trend": f["trend"],
+            "shortfall": shortfall,
+            "recommended_quantity": shortfall,
+            "line_cost": line_cost,
+            "priority_score": priority,
+            "selected": False,
+        })
+
+    candidates.sort(key=lambda c: c["priority_score"], reverse=True)
+
+    # Greedy fill: walk the priority-sorted list and mark items selected
+    # while they fit. Items that don't fit are skipped (not a hard stop),
+    # so a cheap low-priority item can still fill leftover budget.
+    remaining = budget
+    for c in candidates:
+        if c["line_cost"] <= remaining:
+            c["selected"] = True
+            remaining -= c["line_cost"]
+
+    return {
+        "budget": budget,
+        "recommendations": candidates,
+        "total_selected_cost": round(budget - remaining, 2),
+        "remaining_budget": round(remaining, 2),
+    }
+
+@app.get("/api/purchase-orders", response_model=List[PurchaseOrder])
+def get_purchase_orders():
+    """List submitted purchase orders (newest first)."""
+    return sorted(purchase_orders, key=lambda p: p["created_date"], reverse=True)
+
+@app.post("/api/purchase-orders", response_model=List[PurchaseOrder], status_code=201)
+def create_purchase_orders(req: CreatePurchaseOrderRequest):
+    """Create one PO per line item, enriched from inventory with lead time."""
+    if not req.items:
+        raise HTTPException(status_code=400, detail="items cannot be empty")
+
+    inv_by_sku = {i["sku"]: i for i in inventory_items}
+    today = date.today()
+    created = []
+    for line in req.items:
+        inv = inv_by_sku.get(line.sku)
+        if not inv:
+            raise HTTPException(status_code=400, detail=f"Unknown SKU: {line.sku}")
+        lead = WAREHOUSE_LEAD_TIME_DAYS.get(inv["warehouse"], 7)
+        po_id = str(len(purchase_orders) + 1)
+        po = {
+            "id": po_id,
+            "order_number": f"PO-{today.year}-{int(po_id):04d}",
+            "item_sku": line.sku,
+            "item_name": inv["name"],
+            "warehouse": inv["warehouse"],
+            "quantity": line.quantity,
+            "unit_cost": inv["unit_cost"],
+            "total_cost": round(line.quantity * inv["unit_cost"], 2),
+            "status": "Submitted",
+            "created_date": today.isoformat(),
+            "lead_time_days": lead,
+            "expected_delivery_date": (today + timedelta(days=lead)).isoformat(),
+        }
+        purchase_orders.append(po)
+        created.append(po)
+    return created
 
 if __name__ == "__main__":
     import uvicorn
